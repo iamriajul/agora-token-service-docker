@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Print Tags
         run: git tag -l
@@ -19,6 +21,7 @@ jobs:
         with:
           repository: AgoraIO-Community/agora-token-service
           path: agora-token-service
+          fetch-depth: 0
 
       - name: Print Tags
         run: git -C agora-token-service tag -l
