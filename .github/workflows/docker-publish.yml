@@ -13,27 +13,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get GitHub Release JSON
+      - name: Get latest Github release
         id: get_release
-        uses: ctrlaltdev/get-releases-action@v1.3.0
+        uses: rez0n/actions-github-release@v2.0
         with:
-          repo: AgoraIO-Community/agora-token-service
+          repository: AgoraIO-Community/agora-token-service
+          type: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-          fields: tag_name
-          limit: 1
 
-      - name: Check if tag_name is already in the README.md
+      - name: Check if release is already in the README.md
         run: |
-          if grep -q "${{ steps.get_release.outputs.releases[0].tag_name }}" README.md; then
-            echo "Tag (${{ steps.get_release.outputs.releases[0].tag_name }}) already in README.md"
-            exit 1
+          if grep -q ${{ steps.get_release.outputs.release }} README.md; then
+            echo "Tag (${{ steps.get_release.outputs.release }}) already in README.md"
+            exit 0
           fi
 
       - name: Checkout the agora-token-service repo
         uses: actions/checkout@v2
         with:
           repository: AgoraIO-Community/agora-token-service
-          ref: ${{ steps.get_release.outputs.releases[0].tag_name }}
+          ref: ${{ steps.get_release.outputs.release }}
           path: agora-token-service
 
       - name: Copy our Dockerfile
@@ -56,12 +55,12 @@ jobs:
         with:
           context: agora-token-service
           push: true
-          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.releases[0].tag_name }},iamriajul/agora-token-service:latest
+          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.release }},iamriajul/agora-token-service:latest
           platforms: linux/amd64,linux/arm64
 
       - name: Append the version to README.md
         run: |
-          echo - ${{ steps.get_release.outputs.releases[0].tag_name }} >> README.md
+          echo - ${{ steps.get_release.outputs.release }} >> README.md
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
