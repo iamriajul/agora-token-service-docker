@@ -1,6 +1,6 @@
 # agora-token-service-docker
 
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/iamriajul/agora-token-service)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/iamriajul/agora-token-service) [![Docker Pulls](https://img.shields.io/docker/pulls/iamriajul/agora-token-service.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/iamriajul/agora-token-service)
 
 Docker Hub Tags: https://hub.docker.com/r/iamriajul/agora-token-service/tags
 
