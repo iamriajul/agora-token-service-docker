@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,6 +55,33 @@ jobs:
           push: true
           tags: iamriajul/agora-token-service:${{ env.RELEASE_VERSION }},iamriajul/agora-token-service:latest
           platforms: linux/amd64,linux/arm64
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
 
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      # Remove the version prefix from the tag, eg: v1.0.0 -> 1.0.0
+      - name: Docker Tag
+        run: echo "RELEASE_VERSION=${RELEASE_VERSION#v}" >> $GITHUB_ENV
+
+      # Replace version iamriajul/agora-token-service:1.0.0 with iamriajul/agora-token-service:${RELEASE_VERSION}
+      - name: Update README.md
+        run: |
+            sed -i "s#iamriajul/agora-token-service:[0-9]\+\.[0-9]\+\.[0-9]\+#iamriajul/agora-token-service:${RELEASE_VERSION}#g" README.md
+
+      # Commit all changed files back to the repository
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update README.md"
+          commit_options: '--no-verify --signoff'
+          commit_user_name: "iamriajul"
+          commit_user_email: "kmriajulislami@gmail.com"
+          commit_author: "iamriajul <kmriajulislami@gmail.com>"
 
