@@ -15,16 +15,16 @@ jobs:
 
       - name: Get latest Github release
         id: get_release
-        uses: rez0n/actions-github-release@v2.0
+        uses: KevinRohn/github-full-release-data@v2
         with:
           repository: AgoraIO-Community/agora-token-service
-          type: latest
+          version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if release is already in the README.md
         run: |
-          if grep -q ${{ steps.get_release.outputs.release }} README.md; then
-            echo "Tag (${{ steps.get_release.outputs.release }}) already in README.md"
+          if grep -q ${{ steps.get_release.outputs.tag_name }} README.md; then
+            echo "Tag (${{ steps.get_release.outputs.tag_name }}) already in README.md"
             exit 0
           fi
 
@@ -55,12 +55,12 @@ jobs:
         with:
           context: agora-token-service
           push: true
-          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.release }},iamriajul/agora-token-service:latest
+          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.tag_name }},iamriajul/agora-token-service:latest
           platforms: linux/amd64,linux/arm64
 
       - name: Append the version to README.md
         run: |
-          echo - ${{ steps.get_release.outputs.release }} >> README.md
+          echo - ${{ steps.get_release.outputs.tag_name }} >> README.md
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
