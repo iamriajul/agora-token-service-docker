@@ -1,11 +1,10 @@
 name: Docker Publish
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 10 * * *'
   push:
-    tags: [ 'v*.*.*' ]
+    tags: [
+      'v*.*.*'
+    ]
 
 jobs:
   build:
@@ -13,26 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get latest Github release
-        id: get_release
-        uses: KevinRohn/github-full-release-data@v2
-        with:
-          repository: AgoraIO-Community/agora-token-service
-          version: latest
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check if release is already in the README.md
-        run: |
-          if grep -q ${{ steps.get_release.outputs.tag_name }} README.md; then
-            echo "Tag (${{ steps.get_release.outputs.tag_name }}) already in README.md"
-            exit 0
-          fi
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - name: Checkout the agora-token-service repo
         uses: actions/checkout@v2
         with:
           repository: AgoraIO-Community/agora-token-service
-          ref: ${{ steps.get_release.outputs.release }}
+          ref: ${{ env.RELEASE_VERSION }}
           path: agora-token-service
 
       - name: Copy our Dockerfile
@@ -55,17 +42,8 @@ jobs:
         with:
           context: agora-token-service
           push: true
-          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.tag_name }},iamriajul/agora-token-service:latest
+          tags: iamriajul/agora-token-service:${{ env.RELEASE_VERSION }},iamriajul/agora-token-service:latest
           platforms: linux/amd64,linux/arm64
-
-      - name: Append the version to README.md
-        run: |
-          echo - ${{ steps.get_release.outputs.tag_name }} >> README.md
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          file_pattern: 'README.md'
-
 
 
 
