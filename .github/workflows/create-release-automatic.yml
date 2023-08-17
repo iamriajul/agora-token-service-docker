@@ -1,4 +1,4 @@
-name: Docker Publish Automatic
+name: Create Release Automatic
 
 on:
   workflow_dispatch:
