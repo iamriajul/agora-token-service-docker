@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-tags: true
 
       - name: Get Latest Github Release
         id: agora_release
@@ -19,19 +21,11 @@ jobs:
           version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Latest Github Release
-        id: docker_release
-        uses: KevinRohn/github-full-release-data@v2
-        with:
-          repository: iamriajul/agora-token-service-docker
-          version: latest
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Ensure the release is not already published
+      - name: Ensure the release is not already published via git tag -l
         run: |
-          if [ ${{ steps.agora_release.outputs.tag_name }} == ${{ steps.docker_release.outputs.tag_name }} ]; then
-            echo "${{ steps.agora_release.outputs.tag_name }} already has been released."
-            exit 0
+          if git tag -l | grep -q ${{ steps.agora_release.outputs.tag_name }}; then
+              echo "Tag already exists, exiting"
+              exit 0
           fi
 
       - name: Create a release
