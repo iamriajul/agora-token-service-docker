@@ -11,4 +11,62 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+
+      - name: Get GitHub Release JSON
+        id: get_release
+        uses: ctrlaltdev/get-releases-action@v1
+        with:
+          repo: AgoraIO-Community/agora-token-service
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fields: tag_name
+          limit: 1
+
+      - name: Check if tag_name is already in the README.md
+        run: |
+          if grep -q "${{ steps.get_release.outputs.releases[0].tag_name }}" README.md; then
+            echo "Tag (${{ steps.get_release.outputs.releases[0].tag_name }}) already in README.md"
+            exit 1
+          fi
+
+      - name: Checkout the agora-token-service repo
+        uses: actions/checkout@v2
+        with:
+          repository: AgoraIO-Community/agora-token-service
+          ref: ${{ steps.get_release.outputs.releases[0].tag_name }}
+          path: agora-token-service
+
+      - name: Copy our Dockerfile
+        run: cp Dockerfile agora-token-service/
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: agora-token-service
+          push: true
+          tags: iamriajul/agora-token-service:${{ steps.get_release.outputs.releases[0].tag_name }},iamriajul/agora-token-service:latest
+          platforms: linux/amd64,linux/arm64
+
+      - name: Append the version to README.md
+        run: |
+          echo - ${{ steps.get_release.outputs.releases[0].tag_name }} >> README.md
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: 'README.md'
+
+
+
+
