@@ -21,6 +21,13 @@ jobs:
           version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Exit if the tag_name doesn't match stable version
+        run: |
+          if [[ ${{ steps.agora_release.outputs.tag_name }} != v*.*.* ]]; then
+              echo "Tag name doesn't match stable version, exiting"
+              exit 0
+          fi
+
       - name: Ensure the release is not already published via git tag -l
         run: |
           if git tag -l | grep -q ${{ steps.agora_release.outputs.tag_name }}; then
