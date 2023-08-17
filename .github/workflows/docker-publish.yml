@@ -15,7 +15,7 @@ jobs:
 
       - name: Get GitHub Release JSON
         id: get_release
-        uses: ctrlaltdev/get-releases-action@v1
+        uses: ctrlaltdev/get-releases-action@v1.3.0
         with:
           repo: AgoraIO-Community/agora-token-service
           token: ${{ secrets.GITHUB_TOKEN }}
