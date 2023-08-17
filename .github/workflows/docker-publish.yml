@@ -38,7 +38,7 @@ jobs:
 
       # Remove the version prefix from the tag, eg: v1.0.0 -> 1.0.0
       - name: Docker Tag
-        run: echo ::set-env name=RELEASE_VERSION::${RELEASE_VERSION:1}
+        run: echo "RELEASE_VERSION=${RELEASE_VERSION#v}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@v4
