@@ -37,12 +37,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Remove the version prefix from the tag, eg: v1.0.0 -> 1.0.0
+      - name: Docker Tag
+        run: echo ::set-env name=RELEASE_VERSION::${RELEASE_VERSION:1}
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: agora-token-service
           push: true
-          tags: iamriajul/agora-token-service:${{ env.RELEASE_VERSION:1 }},iamriajul/agora-token-service:latest
+          tags: iamriajul/agora-token-service:${{ env.RELEASE_VERSION }},iamriajul/agora-token-service:latest
           platforms: linux/amd64,linux/arm64
 
 
