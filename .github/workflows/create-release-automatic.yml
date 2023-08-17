@@ -6,8 +6,10 @@ on:
     - cron: '0 10 * * *'
 
 jobs:
-  build:
+  find:
     runs-on: ubuntu-latest
+    outputs:
+      RELEASE_VERSION: ${{ steps.get_tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -21,24 +23,29 @@ jobs:
           fetch-depth: 0
 
       - name: Get first stable tag (eg v1.0.0) which is not used by this repository
+        id: get_tag
         run: |
             for tag in $(git -C agora-token-service tag -l --sort=creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'); do
                 if ! git tag -l | grep -q $tag; then
                     echo "Found tag $tag"
-                    echo "RELEASE_VERSION=$tag" >> $GITHUB_ENV
+                    echo "tag=$tag" >> "$GITHUB_OUTPUT"
                     exit 0
                 fi
             done
             echo "No tag found"
             exit 0
 
+  create:
+    runs-on: ubuntu-latest
+    needs: find
+    if: needs.find.outputs.RELEASE_VERSION
+    steps:
       - name: Get Github Release Data
-        if: env.RELEASE_VERSION
         id: release_data
         uses: KevinRohn/github-full-release-data@v2
         with:
           repository: AgoraIO-Community/agora-token-service
-          version: ${{ env.RELEASE_VERSION }}
+          version: ${{ needs.find.outputs.RELEASE_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
           body-markdown-file-path: ./release-content.md
 
@@ -46,14 +53,13 @@ jobs:
       # And also if we use GITHUB_TOKEN, it will not trigger our other workflow (docker-publish.yml).
       # GitHub Actions prevent trigger workflow using GITHUB_TOKEN, to avoid infinite loop.
       - name: Create a release
-        if: env.RELEASE_VERSION
         uses: actions/create-release@v1
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
-          tag_name: ${{ env.RELEASE_VERSION }}
-          release_name: ${{ env.RELEASE_VERSION }}
+          tag_name: ${{ needs.find.outputs.RELEASE_VERSION }}
+          release_name: ${{ needs.find.outputs.RELEASE_VERSION }}
           body_path: ./release-content.md
           draft: false
           prerelease: false
