@@ -57,6 +57,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
   update-readme:
     runs-on: ubuntu-latest
+    needs: build-and-push
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
