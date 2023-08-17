@@ -24,6 +24,14 @@ jobs:
       - name: Copy our Dockerfile
         run: cp Dockerfile agora-token-service/
 
+      - name: Ensure ./cmd/main.go exists.
+        working-directory: agora-token-service
+        run: |
+          if [ ! -f ./cmd/main.go ]; then
+            mkdir -p ./cmd
+            cp ./main.go ./cmd/main.go
+          fi
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
