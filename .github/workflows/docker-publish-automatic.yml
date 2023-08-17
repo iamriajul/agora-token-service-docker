@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - uses: actions/checkout@v3
         with:
@@ -43,11 +42,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body-markdown-file-path: ./release-content.md
 
+      # Using PAT (Personal Access Token) instead of GITHUB_TOKEN because GITHUB_TOKEN doesn't have permission to create release
+      # And also if we use GITHUB_TOKEN, it will not trigger our other workflow (docker-publish.yml).
+      # Github Actions prevent trigger workflow using GITHUB_TOKEN, to avoid infinite loop.
       - name: Create a release
         uses: actions/create-release@v1
         id: create_release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           tag_name: ${{ steps.release_data.outputs.tag_name }}
           release_name: ${{ steps.release_data.outputs.tag_name }}
