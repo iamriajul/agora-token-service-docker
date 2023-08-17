@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-tags: true
+
+      - name: Print Tags
+        run: git tag -l
 
       - name: Checkout the agora-token-service repo
         uses: actions/checkout@v2
         with:
           repository: AgoraIO-Community/agora-token-service
           path: agora-token-service
-          fetch-tags: true
+
+      - name: Print Tags
+        run: git -C agora-token-service tag -l
 
       - name: Get first stable tag (eg v1.0.0) which is not used by this repository
         id: get_tag
