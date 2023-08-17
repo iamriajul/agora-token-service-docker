@@ -13,6 +13,8 @@ RUN go mod download && go mod verify
 
 COPY . .
 
+COPY main.go ./cmd
+
 # Create a static binary
 RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a -installsuffix cgo -o /go/bin/server ./cmd/main.go
 
