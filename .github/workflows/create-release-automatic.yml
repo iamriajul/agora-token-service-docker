@@ -21,7 +21,6 @@ jobs:
           fetch-depth: 0
 
       - name: Get first stable tag (eg v1.0.0) which is not used by this repository
-        id: get_tag
         run: |
             for tag in $(git -C agora-token-service tag -l --sort=creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'); do
                 if ! git tag -l | grep -q $tag; then
@@ -31,9 +30,10 @@ jobs:
                 fi
             done
             echo "No tag found"
-            exit 1
+            exit 0
 
       - name: Get Github Release Data
+        if: env.RELEASE_VERSION
         id: release_data
         uses: KevinRohn/github-full-release-data@v2
         with:
@@ -44,8 +44,9 @@ jobs:
 
       # Using PAT (Personal Access Token) instead of GITHUB_TOKEN because GITHUB_TOKEN doesn't have permission to create release
       # And also if we use GITHUB_TOKEN, it will not trigger our other workflow (docker-publish.yml).
-      # Github Actions prevent trigger workflow using GITHUB_TOKEN, to avoid infinite loop.
+      # GitHub Actions prevent trigger workflow using GITHUB_TOKEN, to avoid infinite loop.
       - name: Create a release
+        if: env.RELEASE_VERSION
         uses: actions/create-release@v1
         id: create_release
         env:
