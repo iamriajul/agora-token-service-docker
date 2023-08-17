@@ -41,6 +41,7 @@ jobs:
           repository: AgoraIO-Community/agora-token-service
           version: ${{ env.RELEASE_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          body-markdown-file-path: release_data_body.md
 
       - name: Create a release
         uses: actions/create-release@v1
@@ -50,8 +51,7 @@ jobs:
         with:
           tag_name: ${{ steps.release_data.outputs.tag_name }}
           release_name: ${{ steps.release_data.outputs.tag_name }}
-          body: |
-            ${{ steps.release_data.outputs.body }}
+          body_path: release_data_body.md
           draft: false
           prerelease: false
 
