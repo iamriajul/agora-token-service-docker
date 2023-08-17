@@ -23,9 +23,20 @@ jobs:
       - name: Get first stable tag (eg v1.0.0) which is not used by this repository
         id: get_tag
         run: |
-            for tag in $(git -C agora-token-service tag -l --sort=creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'); do
+            for tag in $(git -C agora-token-service tag -l --sort=creatordate | grep -E '^v?[0-9]+\.[0-9]+(\.[0-9]+)?$'); do
                 if ! git tag -l | grep -q $tag; then
                     echo "Found tag $tag"
+          
+                    #region Fix Semantic Versioning
+                    if [[ $tag != v* ]]; then
+                        tag="v$tag" 
+                    fi
+                    
+                    if [[ $tag == v*.* ]]; then
+                        tag="$tag.0"
+                    fi
+                    #endregion
+                    
                     echo "RELEASE_VERSION=$tag" >> $GITHUB_ENV
                     exit 0
                 fi
