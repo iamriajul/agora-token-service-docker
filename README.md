@@ -11,7 +11,7 @@ version: '3.7'
 
 services:
   agora-token:
-    image: iamriajul/agora-token-service:latest # or specify a tag like iamriajul/agora-token-service:1.0.0
+    image: iamriajul/agora-token-service:latest # or specify a tag like iamriajul/agora-token-service:1.4.2
     ports:
       - 8080:8080 # the image exposes port 8080
     environment:
