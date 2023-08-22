@@ -43,6 +43,8 @@ jobs:
       - name: Get Github Release Data
         id: release_data
         uses: cardinalby/git-get-release-action@1.2.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repo: AgoraIO-Community/agora-token-service
           tag: ${{ needs.find.outputs.RELEASE_VERSION }}
