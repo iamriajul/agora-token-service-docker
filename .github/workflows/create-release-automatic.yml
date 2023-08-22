@@ -42,12 +42,10 @@ jobs:
     steps:
       - name: Get Github Release Data
         id: release_data
-        uses: KevinRohn/github-full-release-data@v2
+        uses: cardinalby/git-get-release-action@1.2.4
         with:
-          repository: AgoraIO-Community/agora-token-service
-          version: ${{ needs.find.outputs.RELEASE_VERSION }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body-markdown-file-path: ./release-content.md
+          repo: AgoraIO-Community/agora-token-service
+          tag: ${{ needs.find.outputs.RELEASE_VERSION }}
 
       # Using PAT (Personal Access Token) instead of GITHUB_TOKEN because GITHUB_TOKEN doesn't have permission to create release
       # And also if we use GITHUB_TOKEN, it will not trigger our other workflow (docker-publish.yml).
@@ -60,7 +58,8 @@ jobs:
         with:
           tag_name: ${{ needs.find.outputs.RELEASE_VERSION }}
           release_name: ${{ needs.find.outputs.RELEASE_VERSION }}
-          body_path: ./release-content.md
+          body: |
+            ${{ steps.release_data.outputs.body }}
           draft: false
           prerelease: false
 
